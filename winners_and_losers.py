@@ -36,6 +36,7 @@ def determine_winner(matchup, week_number, year):
 
         return (winner, loser)
 
+
 def rank_projection_diff(projection_diff):
      if projection_diff <= 0:
           return 0
@@ -72,6 +73,7 @@ def rank_win_streak(win_streak):
      else:
           return win_streak
     
+
 def enirich_win_df(df):
      enriched_df = df.copy()
      enriched_df['score_diff_rank'] = enriched_df['score_diff'].apply(rank_score_diff)
@@ -79,6 +81,7 @@ def enirich_win_df(df):
      enriched_df['win_streak_rank'] = enriched_df['win_streak'].apply(rank_win_streak)
      enriched_df['beast_score'] = enriched_df['win_streak_rank'] + enriched_df['projection_diff_rank'] + enriched_df['score_diff_rank']
      return enriched_df
+
 
 def main():
     league = League(league_id=LEAGUE_ID, year=YEAR, espn_s2=ESPN_S2, swid=SWID)
@@ -100,7 +103,7 @@ def main():
     print("Enriched DF")
     print(enirich_win_df(winners_base).head())
 
-    
+
 
 
 
