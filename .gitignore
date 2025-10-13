@@ -212,4 +212,5 @@ __marimo__/
 config.py
 
 #Images
+Images/
 *.png

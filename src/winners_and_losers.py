@@ -1,6 +1,9 @@
 import pandas as pd
+import time
 from espn_api.football import League
 from config import SWID, ESPN_S2, LEAGUE_ID, YEAR
+from image_gen import generate_image, add_text
+from prompt_gen import create_majestic_prompt
 
 def determine_winner(matchup, week_number, year): 
         home_projection_diff = round(matchup.home_score - matchup.home_projected, 2)
@@ -94,18 +97,26 @@ def main():
         winners_data_row.append(winner_loser[0])
         losers_data_row.append(winner_loser[1])
     
-    winners_base = pd.DataFrame(winners_data_row)
-    losers_base = pd.DataFrame(losers_data_row)
+    winners_base_df = pd.DataFrame(winners_data_row)
+    losers_base_df = pd.DataFrame(losers_data_row)
 
     print("winners")
-    print(winners_base.head())
+    print(winners_base_df.head())
 
     print("Enriched DF")
-    print(enirich_win_df(winners_base).head())
+    winners_enriched_df = enirich_win_df(winners_base_df)    
 
+    for team, beast_score in zip(winners_enriched_df['team_name'], winners_enriched_df["beast_score"]):
+        print(f"{team}, score:{beast_score}")
+        top_text = f"what it feels like to be: {team.team_name}"
+        bottom_text = f"Going into week {league.current_week}"
 
-
-
+        prompt = create_majestic_prompt("galloping horses", beast_score, time.time())
+        print(prompt)
+        image = generate_image(prompt, "prompthero/openjourney")
+        image = add_text(image, top_text, bottom_text)
+        image.save(f"Images/{team.team_name.replace(' ', '_')}_week{league.current_week}_score{beast_score}.png")
+     
 
 
 if __name__ == "__main__":
