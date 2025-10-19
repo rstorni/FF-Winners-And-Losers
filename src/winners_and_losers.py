@@ -2,7 +2,7 @@ import pandas as pd
 import time
 from espn_api.football import League
 from config import SWID, ESPN_S2, LEAGUE_ID, YEAR
-from image_gen import generate_image, add_text
+from image_gen import generate_image, add_text, generate_image_vertexAI
 from prompt_gen import create_majestic_prompt
 from data_gen import process_matchup, enriches_teams_dataframe
 
@@ -20,16 +20,21 @@ def main():
 	teams_enriched_df = enriches_teams_dataframe(teams_base_df)
 	print(teams_enriched_df.head(16))
 
-	for team, beast_score in zip(winners_enriched_df['team_name'], winners_enriched_df["beast_score"]):
+	for team, beast_score, result in zip(teams_enriched_df['team_name'], teams_enriched_df["beast_score"], teams_enriched_df['result']):
 		print(f"{team}, score:{beast_score}")
-		top_text = f"what it feels like to be: {team.team_name}"
+		top_text = f"What it feels like to be:\n{team.team_name}"
 		bottom_text = f"Going into week {league.current_week}"
 
-		prompt = create_majestic_prompt("galloping horses", beast_score, time.time())
-		print(prompt)
-		image = generate_image(prompt, "prompthero/openjourney")
-		image = add_text(image, top_text, 50, 50, 20)
-		image = add_text(image, bottom_text, 50, 450, 20)
+		theme = "galloping horses" if result == "WIN" else "disapointed cickens, penguins, or rats"
+
+		prompt = create_majestic_prompt(theme, result, beast_score, time.time())
+		print(f"{prompt} \n\n")
+		image = generate_image_vertexAI(prompt)
+		if image is None:
+			print(f"Failed to generate image for {team.team_name}")
+			continue
+		image = add_text(image, top_text, 300, 50, 45)
+		image = add_text(image, bottom_text, 300, 900, 45)
 		image.save(f"Images/{team.team_name.replace(' ', '_')}_week{league.current_week}_score{beast_score}.png")
 	 
 

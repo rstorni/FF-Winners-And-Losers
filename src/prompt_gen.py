@@ -1,12 +1,7 @@
 import random
 import time
-from image_gen import generate_image, add_text
 
-def create_majestic_prompt(subject, beast_score, seed=None):
-    if seed is not None:
-        random.seed(seed)
-
-    majesty_tiers = {
+winning_majesty_tiers = {
         0: {
             "adjectives": ["simple", "plain", "modest", "minimalist", "understated"],
             "atmosphere": [
@@ -49,7 +44,57 @@ def create_majestic_prompt(subject, beast_score, seed=None):
         }
     }
 
-    majesty_level = max(0, min(15, beast_score))  # Clamp to [0, 15]
+losing_majesty_tiers = {
+    0: {
+        "adjectives": ["pathetic", "pitiful", "miserable", "dejected", "deflated", "woeful"],
+        "atmosphere": [
+            "harsh fluorescent lighting, empty room, lonely corner, depressing isolation",
+            "cold gray morning, empty parking lot, abandoned feeling, nobody cares",
+            "dim room lighting, staring at wall, profound sadness, utterly alone"
+        ],
+        "quality": ["depressingly mundane", "sadly realistic", "uncomfortably detailed", "dreary"],
+        "extras": ["heartbreaking", "crushingly ordinary", "profoundly sad", "emotionally drained", "defeated spirit", "given up"]
+    },
+    1: {
+        "adjectives": ["gloomy", "dreary", "dismal", "bleak", "somber", "melancholic"],
+        "atmosphere": [
+            "overcast skies, muted colors, fading light, heavy fog",
+            "perpetual twilight, gray clouds, diminishing hope, shadowy gloom",
+            "cold filtered light through clouds, lifeless ambiance, colorless world"
+        ],
+        "quality": ["moody photography", "depressing atmosphere", "desaturated", "grim detail"],
+        "extras": ["oppressive", "joyless", "drained", "weary", "forgotten", "hollow"]
+    },
+    2: {
+        "adjectives": ["dull", "bland", "unremarkable", "mediocre", "forgettable", "mundane"],
+        "atmosphere": [
+            "flat lighting, uninspired composition, beige tones",
+            "fluorescent office lighting, sterile environment, lifeless",
+            "overcast afternoon, no shadows, completely average view"
+        ],
+        "quality": ["acceptable", "passable", "basic quality", "stock photo aesthetic"],
+        "extras": ["monotonous", "tedious", "lackluster", "uninspiring", "", "neutral"]
+    },
+    3: {
+        "adjectives": ["slightly worn", "faded", "tired", "weathered", "diminished", "tarnished"],
+        "atmosphere": [
+            "cloudy day, muted sunlight, past-its-prime",
+            "late afternoon overcast, hints of wear, slightly neglected",
+            "soft gray light, gentle deterioration, quiet decline"
+        ],
+        "quality": ["detailed but faded", "lived-in", "showing age", "slightly weathered"],
+        "extras": ["melancholy", "wistful", "subdued", "gentle sadness", "bittersweet", "resigned"]
+    }
+}
+
+def create_majestic_prompt(subject, result, beast_score, seed=None):
+    if seed is not None:
+        random.seed(seed)
+
+    is_winner = True if result == 'WIN' else False
+    beast_score = abs(beast_score)
+    majesty_tiers = winning_majesty_tiers if is_winner else losing_majesty_tiers
+    majesty_level = max(0, min(15, beast_score)) # Clamp to [0, 15]
     normalized_level = majesty_level / 15.0  # Convert to [0, 1]
     tier_index = normalized_level * 3  # Scale to [0, 3]
     lower_tier = int(tier_index)
@@ -74,6 +119,6 @@ def create_majestic_prompt(subject, beast_score, seed=None):
     if extra:  # Only add if extra is not empty
         prompt_parts.insert(1, extra)
     
-    prompt = ", ".join(prompt_parts) + ", mdjrny-v4 style"
+    prompt = ", ".join(prompt_parts) + ", randomized"
     
     return prompt
