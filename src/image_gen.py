@@ -1,7 +1,5 @@
 from diffusers import StableDiffusionPipeline
-from PIL import Image
-from PIL import ImageFont
-from PIL import ImageDraw 
+from PIL import Image, ImageFont, ImageDraw
 import torch
 import time
 
@@ -13,11 +11,11 @@ def generate_image(prompt, model_id):
     image = pipe(prompt).images[0]
     return image
 
-
-def add_text(image, top_text, bottom_text):
+def add_text(image, text, x_axis=50, y_axis=50, font_size=16, 
+                         text_color=(0, 0, 0), border_color=(255, 255, 255), 
+                         border_width=2):
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype('Fonts/OpenSansEmoji.ttf', 20, encoding='unic')
-    draw.text((50, 50),top_text,(000,000,000),font=font)
-    draw.text((125, 450),bottom_text,(000,000,000),font=font)
-    
+    font = ImageFont.truetype('Fonts/OpenSansEmoji.ttf', font_size, encoding='unic')
+    draw.text((x_axis, y_axis), text, fill=text_color, font=font, stroke_width=border_width, stroke_fill=border_color)
     return image
+
